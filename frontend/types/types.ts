@@ -14,7 +14,7 @@ export interface Product {
   rating: number;
   reviews: number;
   features: string[];
-  specifications: Record<string>;
+  specifications: Record<string,any>;
   isFeatured: boolean;
   isNew: boolean;
   tags: string[];
