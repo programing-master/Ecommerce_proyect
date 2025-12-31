@@ -2,7 +2,7 @@
 import { Product } from "@/types/types";
 import { FaStar, FaShoppingCart, FaHeart, FaTag } from "react-icons/fa";
 import { MdLocalShipping, MdCheckCircle } from "react-icons/md";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useCart } from "@/hooks/useCart";
 
 interface ProductCardProps {
@@ -14,27 +14,13 @@ export default function ProductCard({
   product,
   onToggleFavorite,
 }: ProductCardProps) {
-  const { addProduct, cartItems = [] } = useCart(); // Valor por defecto
+  const { addProduct, isInCart } = useCart();
   const [isFavorite, setIsFavorite] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const [isInCart, setIsInCart] = useState(false);
   
   const discountPercentage = product.discountPrice
-    ? Math.round(
-        ((product.price - product.discountPrice) / product.price) * 100
-      )
+    ? Math.round(((product.price - product.discountPrice) / product.price) * 100)
     : 0;
-
-  useEffect(() => {
-    if (cartItems && Array.isArray(cartItems)) {
-      const inCart = cartItems.some(item => 
-        item && item.product && item.product.id === product.id
-      );
-      setIsInCart(inCart);
-    } else {
-      setIsInCart(false);
-    }
-  }, [cartItems, product.id]);
 
   const handleFavoriteClick = () => {
     setIsFavorite(!isFavorite);
@@ -47,13 +33,15 @@ export default function ProductCard({
     setIsAddingToCart(true);
     
     if (addProduct) {
-      addProduct(product, 1);
+      addProduct(product);
     }
     
     setTimeout(() => {
       setIsAddingToCart(false);
     }, 1000);
   };
+
+  const productInCart = isInCart ? isInCart(product.id) : false;
 
   return (
     <div className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 hover:border-cyan-100 max-w-sm">
@@ -75,7 +63,7 @@ export default function ProductCard({
             FEATURED
           </div>
         )}
-        {isInCart && (
+        {productInCart && (
           <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-lg">
             IN CART
           </div>
@@ -159,10 +147,12 @@ export default function ProductCard({
           </span>
         </div>
 
+        {/* Descripción corta */}
         <p className="text-gray-600 text-sm mb-5 line-clamp-2 leading-relaxed">
           {product.description}
         </p>
 
+        {/* Precios */}
         <div className="flex items-center gap-3 mb-5">
           {product.discountPrice ? (
             <>
@@ -183,6 +173,7 @@ export default function ProductCard({
           )}
         </div>
 
+        {/* Características destacadas */}
         <div className="mb-6">
           <div className="text-sm font-semibold text-gray-700 mb-2">
             Key Features:
@@ -200,17 +191,18 @@ export default function ProductCard({
           </div>
         </div>
 
+        {/* Botones de acción */}
         <div className="flex gap-3">
           <button
             onClick={handleAddToCart}
-            disabled={product.stock === 0 || isAddingToCart || isInCart}
+            disabled={product.stock === 0 || isAddingToCart || productInCart}
             className={`
-              flex-1 ${isInCart 
+              flex-1 ${productInCart 
                 ? 'bg-gradient-to-r from-emerald-500 to-green-500' 
                 : 'bg-gradient-to-r from-cyan-500 to-blue-500'
               } 
               text-white font-bold py-3.5 rounded-xl
-              hover:${isInCart ? 'from-emerald-600 to-green-600' : 'from-cyan-600 to-blue-600'} 
+              hover:opacity-90 
               transition-all duration-300
               flex items-center justify-center gap-3
               disabled:opacity-50 disabled:cursor-not-allowed
@@ -223,7 +215,7 @@ export default function ProductCard({
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                 Adding...
               </>
-            ) : isInCart ? (
+            ) : productInCart ? (
               <>
                 <FaShoppingCart />
                 Already in Cart
