@@ -336,7 +336,7 @@ export default function StorePage() {
             </div>
           </div>
 
-          <div className="lg:w-3/4">
+          <div className=" w-full">
             <div className="bg-white rounded-2xl shadow-sm p-6 mb-8 border border-gray-200">
               <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 <div className="flex items-center gap-6">
@@ -355,7 +355,7 @@ export default function StorePage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex  items-center gap-2">
                   {/* Botón filtros móviles */}
                   <button
                     onClick={() => setShowFilters(!showFilters)}
